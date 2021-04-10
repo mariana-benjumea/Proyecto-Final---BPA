@@ -7,7 +7,7 @@ Este ejercicio consiste en mostrar la capacidad del alumno/a de:
 
 2. Describir de manera grafica y estadistica las variables de la base de datos. Importante explicar la eleccion de los graficos asi como lo que se observa en los descriptivos estadisticos.
 
-*Puntos importantes: tendencia central, dispersion, forma de la distribucion (normalidad), *valores perdidos, valores extremos
+* Puntos importantes: tendencia central, dispersion, forma de la distribucion (normalidad), *valores perdidos, valores extremos
 
 3. Llevar a cabo un analisis estadistico en R y saber interpretar los resultados.
 Para dicho analisis, el alumno/a podra elegir entre las dos siguientes opciones:
@@ -19,7 +19,7 @@ Opcional: en cualquiera de las elecciones se podra incluir covariables para real
 Pautas para el analisis:
 
 * Cual es la hipotesis nula y la hipotesis alternativa?
-* Que analisis es correcto para testar dicha hipotesis? ?Por qu??
+* Que analisis es correcto para testar dicha hipotesis? Por què?
 * Mostrar los resultados y representarlos graficamente
 * Interpretar los resultados
 * Sacar conclusiones en base a los resultados obtenidos y en relacion con la hipotesis inicial.
