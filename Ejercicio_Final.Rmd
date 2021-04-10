@@ -1,0 +1,478 @@
+---
+title: "Proyecto Final"
+author: "Marcelo Contreras~Victor Bucheli~Laura Benítez~Mariana Benjumea~Melissa Domond"
+date: "16/12/2020"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    collapsed: true
+    number_sections: false
+    theme: united
+    fig_width: 7
+    fig_height: 6
+    fig_caption: true
+   
+---
+
+## Introducción
+
+El objetivo del presente trabajo es realizar un análisis estadístico de los datos aportados en la 
+base de datos *"Dataset_Compradores.csv"*.En los primeros pasos, se realizará un análisis descriptivo y gráfico de las variables. Finalmente, se realizará un análisis estadístico.
+
+
+### **Importando las librerías necesarias**
+Lo primero que se ha llegado a cabo es la importación de las librerías necesarias para el análisis de nuestra Base de Datos.
+
+
+```{r, echo=FALSE,message=FALSE}
+library("stats")#funciones estadisticas
+library("dplyr")#manipulación y operaciones con data frames
+library("ggplot2")#creacion de graficos avanzados
+library("tidyverse")#conjunto de paquetes para manejar, transformar, y visualizar datos
+library("psych")#manejo estadisticas creados por psicologos
+library("knitr")
+library('nortest')# nos entra el Lillie Test
+library('gplots')#graficar medias
+
+```
+
+### **PASO 1: Importa Data a Analizar**
+
+Importamos el archivo con la data a través del siguiente comando:
+
+
+```{r}
+
+Compradores_datos<- read.csv("Dataset_Compradores.csv", header = TRUE,dec='.')
+
+
+```
+
+### **PASO2: Revisión Contenido Data**
+
+```{r}
+kable(head(Compradores_datos))
+kable(tail(Compradores_datos))
+```
+
+
+### **PASO 3: Tratamiento de Data**
+
+#### **LIMPIEZA**
+
+Podemos ver que existen columnas llamadas RowNumber y Exited que debemos eliminar de los datos:
+
+
+```{r, echo=FALSE}
+
+Compradores_datos<-select(Compradores_datos, -RowNumber,-Exited) 
+kable(head(Compradores_datos))
+
+```
+
+Comprobamos que las columnas Nrow y Exited ya no existen en nuestra data
+
+### **Identificación de valores ausentes con is.na:**
+
+```{r,echo=FALSE}
+sum(is.na(Compradores_datos))
+
+```
+
+sum(is.na(Compradores_datos)) La presencia de datos ausentes dificulta la mayoría de operaciones matemáticas y de análisis.
+
+### **PASO 4: Análisis Exploratorio**
+
+```{r}
+describe(Compradores_datos)
+
+```
+
+
+
+```{r,echo=FALSE}
+dim(Compradores_datos)
+class(Compradores_datos)
+
+```
+
+dim(Compradores_datos) nos entrega las dimensiones de nuestro Data Frame Filas x Columnas
+class(Compradores_datos) nos indica que es un DataFrame
+
+### **PASO 5: Estadística descriptiva y Gráfica de las Variables**
+
+
+```{r,echo=FALSE}
+summary(Compradores_datos)
+
+```
+
+Se emplea la función *Summary* que genera un resumen del contenido, para variables númericas aportando estadísticos básicos y para variables cualitativas entrega un conteo de apariciones por posible valor.
+
+#### **Graficando Variable: PAISES**
+
+
+```{r}
+paises<-ggplot(Compradores_datos)+
+  geom_bar(mapping = aes(x=Geography,color=Geography,fill=Geography))+
+  geom_text(stat='count', aes(x = Geography, label = ..count..), vjust = -1)+
+  ylim(0, 7000)+
+  ggtitle('Cantidad de Observaciones Paises')+
+  theme_classic();paises
+
+```
+
+
+```{r,echo=FALSE}
+table(Compradores_datos$Geography)
+
+```
+
+Con la Tabla y Gráfico podemos ver como se distribuyen la cantidad de datos por países.
+
+
+#### **Graficando Variable: GÉNERO**
+
+```{r,echo=FALSE}
+table(Compradores_datos$Gender)# nos indica la cantidad por hombre y mujeres
+genero<-as.factor(Compradores_datos$Gender)
+```
+
+```{r} 
+
+Genero_bar<-ggplot(Compradores_datos)+
+  geom_bar(mapping = aes(x=Gender,color=Gender,fill=Gender))+
+  geom_text(stat='count', aes(x = Gender, label = ..count..), vjust = -1)+
+  ylim(0, 7000)+
+  ggtitle('Cantidad de Observaciones por Género')+
+  theme_classic();Genero_bar
+
+```
+
+#### **Variables GENDER_PAIS**
+
+Cantidad de  Hombres Y Mujeres por País
+
+```{r}
+
+
+Genero_Pais<-ggplot(Compradores_datos)+
+  geom_bar(mapping = aes(x=Gender,color=Gender,fill=Gender))+
+  geom_text(stat='count', aes(x = Gender, label = ..count..), vjust = -1)+
+  ylim(0, 3500)+
+  ggtitle('Cantidad de Observaciones por Género')+
+  facet_grid(.~Geography);Genero_Pais
+
+
+```
+#### **Variables GÉNERO_SALARIO_PAÍS**
+
+```{r}
+Genero_salario<-ggplot(Compradores_datos,aes(x=Gender,y=EstimatedSalary))+
+  geom_boxplot(aes(fill=Gender),outlier.shape ='x')+
+  xlab('Género')+ ylab('Salario Estimado') + 
+  ggtitle('Distribución de Salario por Género-País')+
+  facet_grid(.~Geography)+
+  theme_bw();Genero_salario
+
+```
+
+#### **Variables SALARIO_ESTIMADO_EDAD_PAÍS**
+
+
+```{r}
+
+salario_Edad<-ggplot(Compradores_datos,aes(x=Age,y=EstimatedSalary))+
+  geom_point(mapping = aes(x=Age,y=EstimatedSalary,color=Geography,fill=Geography))+
+  xlab('Edad')+ ylab('Salario Estimado') + 
+  ggtitle('Distribución de Salario por País-Edad');salario_Edad
+salario_Edad<-salario_Edad+
+  geom_smooth(method='lm',color='black')+
+  facet_grid(.~Geography);salario_Edad
+
+
+```
+
+Podemos apreciar que no existe una correlación lineal entre las variables, ya que no hay una tendencia clara en la dispersión de sus datos
+Nota: Si utilizamos un nivel de confianza del 95% y obtenemos que p < .05, rechazamos la H~0~ y decimos que existe una correlación significativa (H~1~)
+
+#### **Variables: CREDIT_SCORE_BALANCE**
+
+```{r}
+
+CreditScore_Balance<-ggplot(Compradores_datos,aes(x=CreditScore,y=Balance))+
+  geom_point(mapping = aes(x=CreditScore,y=Balance,color=Geography,fill=Geography))+
+  xlab('CrediScore')+ ylab('Balance') + 
+  ggtitle('Distribución de Credit Score y Balance');CreditScore_Balance
+CreditScore_Balance<-CreditScore_Balance+
+  geom_smooth(method='lm',color='black')+
+  facet_grid(.~Geography);CreditScore_Balance
+
+```
+
+No se aprecia una correlación por lo que se adeuda (Balance) y rating de crédito (CreditScore)
+
+
+
+#### **Variable: GENERO_PAÍS_SALARIO**
+
+```{r}
+
+Salario_genero_normal <-ggplot(Compradores_datos)
+Salario_genero_normal+geom_histogram(aes(x=EstimatedSalary,y=..density.., fill=Gender), bins = 50, color = 'black') + 
+  xlab('Salario Anual Estimado')+ ylab('Density') + 
+  stat_function(fun = dnorm,args = list(mean = mean(Compradores_datos$EstimatedSalary), 
+                                        sd = sd(Compradores_datos$EstimatedSalary))) + 
+  theme(legend.position = "bottom", legend.direction = "horizontal")+
+  ggtitle('Distribucion de Salario por Género')+
+  facet_grid(Geography~Gender)
+
+```
+
+
+
+Podemos apreciar que la Curtósis es tipo Platicúrtica
+
+
+#### **Variables: TENURE_BALANCE_GENDER**
+
+Relación de deuda vencida por Género 
+
+```{r}
+
+Ternure0<-Compradores_datos %>%
+filter(Tenure == '0') %>%
+  filter(Balance > 0)
+
+Deudavencida <- ggplot(Ternure0, aes(x=Gender, fill=Gender))+
+  geom_bar()+
+  ylim(0,70)+
+  geom_text(stat='count', aes(x = Gender, label = ..count..), vjust = -1)+
+  facet_grid(~Geography);Deudavencida
+
+
+
+```
+
+Observamos que hay tendencia que las mujeres tienen mayor deuda vencida.
+
+#### **Variable: CREDITSCORE_SEGMENTACIÓN_CLIENTE**
+
+```{r,echo=FALSE,message=FALSE}
+
+Compradores_datos$CalificacionCreditScore<-NA
+
+Compradores_datos$CalificacionCreditScore[Compradores_datos$CreditScore <=550]<-'Bad'
+Compradores_datos$CalificacionCreditScore[Compradores_datos$CreditScore>=551 & Compradores_datos$CreditScore<=750]<-'Good'
+Compradores_datos$CalificacionCreditScore[Compradores_datos$CreditScore>=751]<-'Excellent'
+any(is.na(Compradores_datos$CalificacionCreditScore))
+Compradores_datos$CalificacionCreditScore<- factor(Compradores_datos$CalificacionCreditScore, levels = c('Bad','Good','Excellent'), ordered = T)
+table(Compradores_datos$CalificacionCreditScore)
+
+library(scales)
+summary(Compradores_datos$CreditScore)
+creditscorebygender<-ggplot(Compradores_datos)+
+  geom_bar(mapping = aes(x=CalificacionCreditScore,fill=CalificacionCreditScore))+
+theme(panel.background = element_rect(fill='white'),axis.line.x = element_line(colour = 'black', linetype =1, size=1), axis.line.y=element_line(colour = 'black',linetype=1, size=1))+
+  ggtitle('Credit Score by Country')+
+  theme(plot.title = element_text(family='',
+                                  size=rel(1.5),
+                                  face="bold",
+                                  color="black",
+                                  lineheight=1.5,
+                                  hjust = 0.5))+
+  xlab('Clasificación Credit Score')+
+  ylab('Count')+
+  theme(axis.title.x = element_text(face="bold", vjust=-0.5, colour="black", size=rel(1.5))) +
+  theme(axis.title.y = element_text(face="bold", vjust=1.5, colour="black", size=rel(1.5)))+
+  facet_grid(.~Geography);creditscorebygender
+
+```
+
+Para esta gráfica utilizamos un supuesto para segmentar a los clientes en base a su credit_score en donde: 
+
+-CreditScore <=550 ->'Bad'
+-CreditScore>=551 & CreditScore<=750 ->'Good'
+-CreditScore>=751->'Excellent'
+
+### **Paso 6: Análisis Estadístico e Interpretación de Resultados**
+
+#### **Hipótesis inicial**:_"el salario de los consumidores es igual en los diferentes paises donde se han recogido los datos"_
+
+
+
+ **H~0~**: la media de los salarios en Alemania,Francia y España son iguales
+
+ **H~1~**: la media de los salarios en Alemania,Francia y España son distintas
+
+Para realizar el análisis hemos escogido el test de ANOVA, ya que existe una variable numérica (Estimated_ Salary) y tres categóricas (Alemania,Francia y España)
+
+```{r}
+
+plotmeans(Compradores_datos$EstimatedSalary~Compradores_datos$Geography,
+          mean.labels=T,main = 'Salario Promedio por País',ylab='Salario Estimado',xlab='País')
+
+```
+
+Como primera impresión podemos ver que existe una similaridad entre medias.
+
+#### **Analizar Supuestos:** {.tabset}
+
+##### **Normalidad**
+
+**HISTOGRAMA Y CURVA NORMAL**
+```{r,echo=FALSE,message=FALSE}
+
+Datos<- Compradores_datos[c(4,12)]
+Datos<-split (Datos, Datos$Geography)
+Datos<- rbind(Datos$France,Datos$Spain,Datos$Germany)
+
+library(plyr)
+m <- ddply(Datos, "Geography", summarise, grp.mean=mean(EstimatedSalary,na.rm = TRUE));
+head(m);
+
+Estimado2<- Datos$EstimatedSalary
+ggplot(data= Compradores_datos,aes(x=EstimatedSalary,fill=Geography))+geom_histogram(aes(y = ..density..),bins=15, color= 'cyan')+
+  stat_function(fun = dnorm,args = list(mean = mean(Compradores_datos$EstimatedSalary), 
+                                        sd = sd(Compradores_datos$EstimatedSalary)))+
+  geom_vline(data=m, aes(xintercept=grp.mean, color="media"),
+             linetype="dashed")+
+  labs(x='Estamated Salary',y= 'Density', 
+       title = "Salario Estimado por país: Distribución normal y Media")+facet_wrap(~Geography,nrow=3)
+
+
+
+```
+
+Podemos observar que la distribución del salario estimado entre país es mas o menos normal, nos apoyaremos de otros métodos para concluir sobre la distribución normal
+
+
+
+```{r,echo=FALSE}
+
+Spain<- filter(Compradores_datos,Geography=='Spain' )
+Salary_Spain<-Spain$EstimatedSalary
+Germany<-filter(Compradores_datos,Geography=='Germany' )
+Salary_Germany<-Germany$EstimatedSalary
+France<-filter(Compradores_datos,Geography=='France')
+Salary_France<-France$EstimatedSalary
+
+EstimatedSalary_1<-Compradores_datos$EstimatedSalary
+normalize_Spain<-mean(EstimatedSalary_1)+(mean(Salary_Spain)-mean(EstimatedSalary_1))+((Salary_Spain)-mean(Salary_Spain))
+normalize_Germany<-mean(EstimatedSalary_1)+(mean(Salary_Germany)-mean(EstimatedSalary_1))+((Salary_Germany)-mean(Salary_Germany))
+normalize_France<-mean(EstimatedSalary_1)+(mean(Salary_France)-mean(EstimatedSalary_1))+((Salary_France)-mean(Salary_France))
+
+df<-rbind(normalize_Spain,normalize_Germany,normalize_France)
+normalizado<-(EstimatedSalary_1-mean(EstimatedSalary_1))/sd(EstimatedSalary_1)
+df_2<-mutate(Compradores_datos,normalizado)
+
+ggplot(df_2,aes(x=normalizado,fill= Geography))+geom_histogram(aes(y = ..density..),bins=15, color= 'cyan')+
+  stat_function(fun = dnorm, args = list(mean = mean(normalizado), sd = sd(normalizado)))+facet_wrap(~Geography,nrow=3) +
+  labs(x='Estamated Salary',y= 'Density')+
+  geom_vline( xintercept=mean(normalizado),color = "red")
+
+```
+
+
+**QQ-TEST**
+
+
+
+```{r}
+qqnorm(Compradores_datos$EstimatedSalary, main="Q-Q plot de los salarios");
+qqline(Compradores_datos$EstimatedSalary,distribution = qnorm, col = "steelblue",lwd = 4)
+
+```
+
+Este test nos representa la distribución que seguirá nuestra distribución si fuera normal.
+
+Se puede observar que existen diferencias entre la curva teórica y la de nuestros datos.
+
+
+**Kolmogorov-Smirnov Tests**
+
+```{r}
+ks.test(Compradores_datos$EstimatedSalary,'pnorm')
+
+```
+
+Según el resultado de este test, la distribución de la variable salario no es normal ya que p value<0.05
+
+ **Lillie test**
+
+
+```{r}
+
+#install.packages('nortest')
+
+lillie.test(Compradores_datos$EstimatedSalary)
+
+```
+
+De nuevo esta hipótesis nos dice que la distribución de la muestra no es normal p-value<0.05
+
+##### **HOMOCEDASTICIDAD**
+
+```{r}
+bartlett.test(Compradores_datos$EstimatedSalary,Compradores_datos$Geography )
+
+```
+
+Según este test, las varianzas son iguales, el p-value > 0.05
+
+También se puede revisar este supuesto mediante un by y observando los resultados que se obtienen
+
+```{r}
+
+
+by(Compradores_datos$EstimatedSalary,Compradores_datos$Geography,var)
+
+
+
+```
+Queda demostrado que las varianzas son prácticamente iguales. 
+
+## {-}
+
+## ANOVA
+
+
+```{r}
+
+anova(lm(Compradores_datos$EstimatedSalary~Compradores_datos$Geography))
+
+
+```
+La primera línea nos habla de la variación entre grupo, se aprueba ya que el P value es > a 0.05
+
+
+
+```{r}
+x <- aov(EstimatedSalary ~ Geography, data = Compradores_datos)
+summary(x)
+
+
+```
+Misma comprobación para ver que las varianzas son muy similares
+
+```{r}
+
+pairwise.t.test(Compradores_datos$EstimatedSalary, Compradores_datos$Geography, p.adj="bonferroni")
+
+```
+
+Finalmente con esta función podemos observar que las medias entre las variables son casi iguales.
+
+## **CONCLUSIÓN**
+
+#### No se rechaza la hipótesis nula H~0~ pues la media de los salarios por país son significativamente similares.
+
+
+
+
+```{r}
+
+
+
