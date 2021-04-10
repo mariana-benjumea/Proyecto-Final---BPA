@@ -12,7 +12,8 @@ Este ejercicio consiste en mostrar la capacidad del alumno/a de:
 3. Llevar a cabo un analisis estadistico en R y saber interpretar los resultados.
 Para dicho analisis, el alumno/a podra elegir entre las dos siguientes opciones:
 
-a) Realizar un analisis de comparacion, siendo la hipotesis inicial: "el salario de los consumidores es igual en los diferentes paises donde se han recogido los datos" b) Realizar un analisis de relacion, siendo la hipotesis inicial: "la edad predice la solvencia (credit score) de los consumidores"
+a) Realizar un analisis de comparacion, siendo la hipotesis inicial: "el salario de los consumidores es igual en los diferentes paises donde se han recogido los datos" 
+b) Realizar un analisis de relacion, siendo la hipotesis inicial: "la edad predice la solvencia (credit score) de los consumidores"
 
 Opcional: en cualquiera de las elecciones se podra incluir covariables para realizar un analisis mas completo (justificar la eleccion e incluir en la interpretacion de los resultados)
 
@@ -22,4 +23,4 @@ Pautas para el analisis:
 * Que analisis es correcto para testar dicha hipotesis? Por què?
 * Mostrar los resultados y representarlos graficamente
 * Interpretar los resultados
-* Sacar conclusiones en base a los resultados obtenidos y en relacion con la hipotesis inicial.
+* Sacar conclusiones en base a los resultados obtenidos y en relacion con la hipotesis inicial
